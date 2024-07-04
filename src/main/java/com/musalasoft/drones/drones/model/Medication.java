@@ -1,15 +1,17 @@
 package com.musalasoft.drones.drones.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "medications")
+@Table(name = "medication")
 public class Medication {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,11 +19,9 @@ public class Medication {
     private String name;
     private BigDecimal weight;
     private String code;
-
-    @Lob
-    private byte[] image;
+    private String image;
 
     @ManyToOne
-    @JoinColumn(name = "drone_id")
+    @JoinColumn(name = "drone_id", nullable = false)
     private Drone drone;
 }

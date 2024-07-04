@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "drones")
+@Table(name = "drone")
 public class Drone {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +23,7 @@ public class Drone {
     private int batteryCapacity;
     @Enumerated
     private DroneStateEnum state;
+
     @OneToMany(mappedBy = "drone", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Medication> medications;
 }

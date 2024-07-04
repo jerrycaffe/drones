@@ -1,0 +1,92 @@
+package com.musalasoft.drones.drones.service;
+
+import com.musalasoft.drones.drones.dto.DroneLoadReq;
+import com.musalasoft.drones.drones.dto.DroneRegisterReq;
+import com.musalasoft.drones.drones.model.Drone;
+import com.musalasoft.drones.drones.model.DroneModelEnum;
+import com.musalasoft.drones.drones.model.DroneStateEnum;
+import com.musalasoft.drones.drones.model.Medication;
+import com.musalasoft.drones.drones.repository.DroneRepository;
+import com.musalasoft.drones.drones.repository.MedicationRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class DroneServiceTest {
+    @Mock
+    DroneRepository droneRepository;
+    @Mock
+    MedicationRepository medicationRepository;
+    @InjectMocks
+    DroneServiceImpl droneService;
+
+    private Drone drone;
+    private Medication medication;
+
+    @BeforeEach
+    public void setUp() {
+        drone = new Drone();
+        drone.setSerialNumber("FD12009");
+        drone.setModel(DroneModelEnum.Lightweight);
+        drone.setId(1L);
+        drone.setBatteryCapacity(100);
+        drone.setWeightLimit(BigDecimal.valueOf(500.20));
+        drone.setState(DroneStateEnum.IDLE);
+        drone.setMedications(new ArrayList<>());
+
+        medication = new Medication();
+        medication.setName("TV");
+        medication.setCode("23902");
+        medication.setId(1L);
+        medication.setWeight(BigDecimal.valueOf(100));
+    }
+
+    @Test
+    public void shouldRegisterDrone() {
+        DroneRegisterReq droneRegisterReq = new DroneRegisterReq();
+
+        droneRegisterReq.setSerialNumber("FD12009");
+        droneRegisterReq.setModel(DroneModelEnum.Lightweight);
+        droneRegisterReq.setWeightLimit(BigDecimal.valueOf(500.20));
+
+
+        when(droneRepository.save(any(Drone.class))).thenReturn(drone);
+
+        var response = droneService.register(droneRegisterReq);
+
+        assertNotNull(response);
+        assertEquals(droneRegisterReq.getSerialNumber(), response.getSerialNumber());
+
+
+    }
+
+    @Test
+    public void shouldLoadMedication() {
+//        Arrange
+        DroneLoadReq droneLoadReq = new DroneLoadReq();
+        droneLoadReq.setCode("23902");
+        droneLoadReq.setName("TV");
+        droneLoadReq.setWeight(BigDecimal.valueOf(20.560));
+
+        when(droneRepository.findById(1L)).thenReturn(Optional.of(drone));
+        when(medicationRepository.save(any(Medication.class))).thenReturn(medication);
+
+        var response = droneService.load(droneLoadReq, 1L);
+
+        assertNotNull(response);
+        assertEquals(1L, response.getDrone().getId());
+        assertEquals(droneLoadReq.getCode(), response.getCode());
+    }
+}
