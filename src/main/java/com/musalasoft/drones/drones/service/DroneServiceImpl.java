@@ -1,5 +1,6 @@
 package com.musalasoft.drones.drones.service;
 
+import com.musalasoft.drones.drones.dto.BatteryDetails;
 import com.musalasoft.drones.drones.dto.DroneLoadReq;
 import com.musalasoft.drones.drones.dto.DroneRegisterReq;
 import com.musalasoft.drones.drones.exception.BadRequestException;
@@ -39,7 +40,7 @@ public class DroneServiceImpl implements DroneService {
     @Override
     public Medication load(DroneLoadReq droneLoadReq, Long droneId) {
 
-        Drone drone = droneRepository.findById(droneId).orElseThrow(()-> new NotFoundException(DRONE_NOT_FOUND));
+        Drone drone = getDroneById(droneId);
         List<Medication> allMedication = drone.getMedications() == null ? new ArrayList<Medication>() : drone.getMedications();
 
         BigDecimal totalWeight = sumMedicationWeight(allMedication);
@@ -53,6 +54,19 @@ public class DroneServiceImpl implements DroneService {
         medication.setDrone(drone);
 
         return medicationRepository.save(medication);
+    }
+
+    private Drone getDroneById(Long id){
+        return droneRepository.findById(id).orElseThrow(()-> new NotFoundException(DRONE_NOT_FOUND));
+    }
+
+    @Override
+    public BatteryDetails checkBattery(Long id) {
+        Drone drone = getDroneById(id);
+        BatteryDetails batteryRes = new BatteryDetails();
+        batteryRes.setBatteryLevel(drone.getBatteryCapacity());
+        batteryRes.setStatus(drone.getState());
+        return batteryRes;
     }
 
     private BigDecimal sumMedicationWeight(List<Medication> medicationList) {
