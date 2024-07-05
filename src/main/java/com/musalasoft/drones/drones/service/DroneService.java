@@ -1,5 +1,6 @@
 package com.musalasoft.drones.drones.service;
 
+import com.musalasoft.drones.drones.dto.BatteryDetails;
 import com.musalasoft.drones.drones.dto.DroneLoadReq;
 import com.musalasoft.drones.drones.dto.DroneRegisterReq;
 import com.musalasoft.drones.drones.model.Drone;
@@ -9,5 +10,5 @@ public interface DroneService {
     Drone register(DroneRegisterReq droneRegisterRequest);
     Medication load(DroneLoadReq droneLoadReq, Long droneId);
 //    DroneCheckResp check(Long droneId);
-//    Drone checkBattery(Long id);
+    BatteryDetails checkBattery(Long id);
 }
