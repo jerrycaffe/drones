@@ -104,4 +104,14 @@ class DroneServiceTest {
         assertEquals("Drone does not exist", exception.getMessage());
 
     }
+
+    @Test
+    public void shouldReturnBatteryDetails(){
+        when(droneRepository.findById(1L)).thenReturn(Optional.of(drone));
+
+        var response = droneService.checkBattery(1L);
+        assertNotNull(response);
+        assertEquals(100, response.getBatteryLevel());
+    }
+
 }
