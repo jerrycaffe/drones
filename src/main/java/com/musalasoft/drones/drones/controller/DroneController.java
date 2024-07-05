@@ -1,5 +1,6 @@
 package com.musalasoft.drones.drones.controller;
 
+import com.musalasoft.drones.drones.dto.BatteryDetails;
 import com.musalasoft.drones.drones.dto.DroneLoadReq;
 import com.musalasoft.drones.drones.dto.DroneRegisterReq;
 import com.musalasoft.drones.drones.model.Drone;
@@ -21,5 +22,12 @@ public class DroneController {
     @PostMapping("/{droneId}")
     public Medication loadMedication(@Valid @RequestBody DroneLoadReq droneLoadReq, @PathVariable Long droneId){
         return droneService.load(droneLoadReq, droneId);
+    }
+
+    @GetMapping("/battery/{droneId}")
+    public BatteryDetails checkBatteryStatus(
+            @PathVariable Long droneId
+    ){
+        return droneService.checkBattery(droneId);
     }
 }
