@@ -7,6 +7,7 @@ import com.musalasoft.drones.drones.model.Medication;
 import com.musalasoft.drones.drones.service.DroneService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class DroneController {
     private final DroneService droneService;
-    @PostMapping()
+    @PostMapping
     public Drone registerDrone(@Valid @RequestBody DroneRegisterReq droneRegisterReq){
         return droneService.register(droneRegisterReq);
     }
