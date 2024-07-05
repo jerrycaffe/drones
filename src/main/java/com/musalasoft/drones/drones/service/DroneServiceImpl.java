@@ -10,7 +10,6 @@ import com.musalasoft.drones.drones.model.Medication;
 import com.musalasoft.drones.drones.repository.DroneRepository;
 import com.musalasoft.drones.drones.repository.MedicationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
