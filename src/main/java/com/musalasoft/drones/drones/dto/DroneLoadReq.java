@@ -17,6 +17,7 @@ public class DroneLoadReq {
     @NotNull(message = "weight is required")
     private BigDecimal weight;
     @NotBlank(message = "code is required")
+    @Pattern(regexp = "^[A-Z0-9_]+$", message = "Code must contain only uppercase letters, numbers and '_'")
     private String code;
     private String imageUrl;
 }
