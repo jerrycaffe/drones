@@ -2,6 +2,7 @@ package com.musalasoft.drones.drones.service;
 
 import com.musalasoft.drones.drones.dto.DroneLoadReq;
 import com.musalasoft.drones.drones.dto.DroneRegisterReq;
+import com.musalasoft.drones.drones.exception.NotFoundException;
 import com.musalasoft.drones.drones.model.Drone;
 import com.musalasoft.drones.drones.model.DroneModelEnum;
 import com.musalasoft.drones.drones.model.DroneStateEnum;
@@ -68,13 +69,14 @@ class DroneServiceTest {
 
         assertNotNull(response);
         assertEquals(droneRegisterReq.getSerialNumber(), response.getSerialNumber());
-
+        assertEquals(100, response.getBatteryCapacity());
+        assertEquals(DroneStateEnum.IDLE, response.getState());
 
     }
 
     @Test
     public void shouldLoadMedication() {
-//        Arrange
+
         DroneLoadReq droneLoadReq = new DroneLoadReq();
         droneLoadReq.setCode("23902");
         droneLoadReq.setName("TV");
@@ -86,7 +88,20 @@ class DroneServiceTest {
         var response = droneService.load(droneLoadReq, 1L);
 
         assertNotNull(response);
-        assertEquals(1L, response.getDrone().getId());
+        assertEquals(1L, response.getId());
         assertEquals(droneLoadReq.getCode(), response.getCode());
+    }
+
+    @Test
+    public void shouldThrowNotFoundIfDroneIdIsMissing() {
+        DroneLoadReq droneLoadReq = new DroneLoadReq();
+        droneLoadReq.setCode("23902");
+        droneLoadReq.setName("TV");
+        droneLoadReq.setWeight(BigDecimal.valueOf(20.560));
+
+        var exception = assertThrows(NotFoundException.class, () -> droneService.load(droneLoadReq, 1L));
+
+        assertEquals("Drone does not exist", exception.getMessage());
+
     }
 }

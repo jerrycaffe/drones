@@ -2,6 +2,8 @@ package com.musalasoft.drones.drones.service;
 
 import com.musalasoft.drones.drones.dto.DroneLoadReq;
 import com.musalasoft.drones.drones.dto.DroneRegisterReq;
+import com.musalasoft.drones.drones.exception.BadRequestException;
+import com.musalasoft.drones.drones.exception.NotFoundException;
 import com.musalasoft.drones.drones.model.Drone;
 import com.musalasoft.drones.drones.model.DroneStateEnum;
 import com.musalasoft.drones.drones.model.Medication;
@@ -38,12 +40,12 @@ public class DroneServiceImpl implements DroneService {
     @Override
     public Medication load(DroneLoadReq droneLoadReq, Long droneId) {
 
-        Drone drone = droneRepository.getReferenceById(droneId);
+        Drone drone = droneRepository.findById(droneId).orElseThrow(()-> new NotFoundException(DRONE_NOT_FOUND));
         List<Medication> allMedication = drone.getMedications() == null ? new ArrayList<Medication>() : drone.getMedications();
 
         BigDecimal totalWeight = sumMedicationWeight(allMedication);
         if (totalWeight.add(droneLoadReq.getWeight()).compareTo(drone.getWeightLimit()) > 0)
-            throw new IllegalArgumentException("Total weight exceeds drone's weight limit");
+            throw new BadRequestException("Total weight exceeds drone's weight limit");
         Medication medication = new Medication();
         medication.setCode(droneLoadReq.getCode());
         medication.setName(droneLoadReq.getName());

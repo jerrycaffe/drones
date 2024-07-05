@@ -1,16 +1,17 @@
 package com.musalasoft.drones.drones.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "medication")
 public class Medication {
     @Id
@@ -21,6 +22,7 @@ public class Medication {
     private String code;
     private String image;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "drone_id", nullable = false)
     private Drone drone;
