@@ -41,7 +41,12 @@ public class DroneServiceImpl implements DroneService {
     public Medication load(DroneLoadReq droneLoadReq, Long droneId) {
 
         Drone drone = getDroneById(droneId);
-        List<Medication> allMedication = drone.getMedications() == null ? new ArrayList<Medication>() : drone.getMedications();
+        List<Medication> allMedication = drone.getMedications();
+
+        //Set status of the drone to loading once this is the first medication being added
+        if(allMedication.isEmpty()) drone.setState(DroneStateEnum.LOADING);
+
+
 
         BigDecimal totalWeight = sumMedicationWeight(allMedication);
         if (totalWeight.add(droneLoadReq.getWeight()).compareTo(drone.getWeightLimit()) > 0)
@@ -67,6 +72,11 @@ public class DroneServiceImpl implements DroneService {
         batteryRes.setBatteryLevel(drone.getBatteryCapacity());
         batteryRes.setStatus(drone.getState());
         return batteryRes;
+    }
+
+    @Override
+    public List<Drone> availableDrones() {
+        return droneRepository.findAllByBatteryCapacityGreaterThanAndState(25, DroneStateEnum.IDLE);
     }
 
     private BigDecimal sumMedicationWeight(List<Medication> medicationList) {
