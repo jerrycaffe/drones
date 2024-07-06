@@ -10,24 +10,35 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/drones")
 @RequiredArgsConstructor
 public class DroneController {
     private final DroneService droneService;
+
     @PostMapping
-    public Drone registerDrone(@Valid @RequestBody DroneRegisterReq droneRegisterReq){
+    public Drone registerDrone(@Valid @RequestBody DroneRegisterReq droneRegisterReq) {
         return droneService.register(droneRegisterReq);
     }
+
     @PostMapping("/{droneId}")
-    public Medication loadMedication(@Valid @RequestBody DroneLoadReq droneLoadReq, @PathVariable Long droneId){
+    public Medication loadMedication(@Valid @RequestBody DroneLoadReq droneLoadReq, @PathVariable Long droneId) {
         return droneService.load(droneLoadReq, droneId);
     }
 
     @GetMapping("/battery/{droneId}")
     public BatteryDetails checkBatteryStatus(
             @PathVariable Long droneId
-    ){
+    ) {
         return droneService.checkBattery(droneId);
+    }
+
+    @GetMapping("/available")
+    public List<Drone> availableDrones(
+
+    ) {
+        return droneService.availableDrones();
     }
 }
