@@ -3,10 +3,8 @@ package com.musalasoft.drones.drones.service;
 import com.musalasoft.drones.drones.dto.DroneLoadReq;
 import com.musalasoft.drones.drones.dto.DroneRegisterReq;
 import com.musalasoft.drones.drones.exception.NotFoundException;
-import com.musalasoft.drones.drones.model.Drone;
-import com.musalasoft.drones.drones.model.DroneModelEnum;
-import com.musalasoft.drones.drones.model.DroneStateEnum;
-import com.musalasoft.drones.drones.model.Medication;
+import com.musalasoft.drones.drones.model.*;
+import com.musalasoft.drones.drones.repository.AuditLogRepository;
 import com.musalasoft.drones.drones.repository.DroneRepository;
 import com.musalasoft.drones.drones.repository.MedicationRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,8 +21,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DroneServiceTest {
@@ -32,6 +30,8 @@ class DroneServiceTest {
     DroneRepository droneRepository;
     @Mock
     MedicationRepository medicationRepository;
+    @Mock
+    AuditLogRepository auditLogRepository;
     @InjectMocks
     DroneServiceImpl droneService;
 
@@ -151,12 +151,29 @@ class DroneServiceTest {
 
         var response = droneService.getDroneById(1L);
         assertNotNull(response);
+
+        verify(droneRepository).findById(1L);
     }
 
     @Test
     public void shouldRThrowNotFoundWhenDroneIsNotFound() {
         var response = assertThrows(NotFoundException.class, () -> droneService.getDroneById(1L));
         assertEquals("Drone does not exist", response.getMessage());
+    }
+
+    @Test
+    public void shouldReturnAllBatteryLevel(){
+        when(droneRepository.findAll()).thenReturn(drones);
+
+        droneService.checkAllBatteryLevels();
+
+        verify(droneRepository).findAll();
+        verify(auditLogRepository, atMost(2)).save(any(AuditLog.class));
+
+
+        verify(auditLogRepository).save(argThat(log -> log.getDroneId().equals(1L) && log.getBatteryCapacity() == 100));
+        verify(auditLogRepository).save(argThat(log -> log.getDroneId().equals(2L) && log.getBatteryCapacity() == 20));
+
     }
 
 }
