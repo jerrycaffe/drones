@@ -5,16 +5,18 @@ import com.musalasoft.drones.drones.dto.DroneLoadReq;
 import com.musalasoft.drones.drones.dto.DroneRegisterReq;
 import com.musalasoft.drones.drones.exception.BadRequestException;
 import com.musalasoft.drones.drones.exception.NotFoundException;
+import com.musalasoft.drones.drones.model.AuditLog;
 import com.musalasoft.drones.drones.model.Drone;
 import com.musalasoft.drones.drones.model.DroneStateEnum;
 import com.musalasoft.drones.drones.model.Medication;
+import com.musalasoft.drones.drones.repository.AuditLogRepository;
 import com.musalasoft.drones.drones.repository.DroneRepository;
 import com.musalasoft.drones.drones.repository.MedicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -23,6 +25,8 @@ import java.util.List;
 public class DroneServiceImpl implements DroneService {
     private final DroneRepository droneRepository;
     private final MedicationRepository medicationRepository;
+    private final AuditLogRepository auditLogRepository;
+
     private final String DRONE_NOT_FOUND = "Drone does not exist";
 
     @Override
@@ -44,8 +48,7 @@ public class DroneServiceImpl implements DroneService {
         List<Medication> allMedication = drone.getMedications();
 
         //Set status of the drone to loading once this is the first medication being added
-        if(allMedication.isEmpty()) drone.setState(DroneStateEnum.LOADING);
-
+        if (allMedication.isEmpty()) drone.setState(DroneStateEnum.LOADING);
 
 
         BigDecimal totalWeight = sumMedicationWeight(allMedication);
@@ -61,8 +64,9 @@ public class DroneServiceImpl implements DroneService {
         return medicationRepository.save(medication);
     }
 
-    private Drone getDroneById(Long id){
-        return droneRepository.findById(id).orElseThrow(()-> new NotFoundException(DRONE_NOT_FOUND));
+    @Override
+    public Drone getDroneById(Long id) {
+        return droneRepository.findById(id).orElseThrow(() -> new NotFoundException(DRONE_NOT_FOUND));
     }
 
     @Override
@@ -82,4 +86,17 @@ public class DroneServiceImpl implements DroneService {
     private BigDecimal sumMedicationWeight(List<Medication> medicationList) {
         return medicationList.isEmpty() ? BigDecimal.ZERO : medicationList.stream().map(Medication::getWeight).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    @Override
+    public void checkAllBatteryLevels(){
+        List<Drone> drones = droneRepository.findAll();
+        for (Drone drone : drones) {
+            AuditLog log = new AuditLog();
+            log.setId(drone.getId());
+            log.setBatteryCapacity(drone.getBatteryCapacity());
+            log.setTimestamp(LocalDateTime.now());
+            auditLogRepository.save(log);
+        }
+    }
+
 }
