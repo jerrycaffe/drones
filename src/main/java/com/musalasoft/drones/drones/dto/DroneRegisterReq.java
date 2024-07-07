@@ -1,12 +1,8 @@
 package com.musalasoft.drones.drones.dto;
 
 import com.musalasoft.drones.drones.model.DroneModelEnum;
-import com.musalasoft.drones.drones.model.DroneStateEnum;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -21,7 +17,5 @@ public class DroneRegisterReq {
     private DroneModelEnum model;
     @NotNull(message = "Drone weight is required")
     private BigDecimal weightLimit;
-
-
 
 }
