@@ -28,6 +28,11 @@ public class DroneController {
         return droneService.load(droneLoadReq, droneId);
     }
 
+    @GetMapping("/{droneId}")
+    public Drone getAllDroneMedication(@PathVariable Long droneId) {
+        return droneService.getDroneById(droneId);
+    }
+
     @GetMapping("/battery/{droneId}")
     public BatteryDetails checkBatteryStatus(
             @PathVariable Long droneId
@@ -37,7 +42,6 @@ public class DroneController {
 
     @GetMapping("/available")
     public List<Drone> availableDrones(
-
     ) {
         return droneService.availableDrones();
     }
