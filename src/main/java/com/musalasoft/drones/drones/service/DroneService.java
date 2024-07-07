@@ -13,6 +13,8 @@ public interface DroneService {
     Drone register(DroneRegisterReq droneRegisterRequest);
     Medication load(DroneLoadReq droneLoadReq, Long droneId);
 //    DroneCheckResp check(Long droneId);
+    void checkAllBatteryLevels();
     BatteryDetails checkBattery(Long id);
     List<Drone> availableDrones();
+    Drone getDroneById(Long droneId);
 }
