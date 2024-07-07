@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,17 +52,6 @@ class DroneServiceTest {
         drone.setState(DroneStateEnum.IDLE);
         drone.setMedications(new ArrayList<>());
 
-
-//        Create drone 2
-        Drone lowBatteryDrone = new Drone();
-        lowBatteryDrone.setSerialNumber("FD120091");
-        lowBatteryDrone.setModel(DroneModelEnum.Lightweight);
-        lowBatteryDrone.setId(2L);
-        lowBatteryDrone.setBatteryCapacity(20);
-        lowBatteryDrone.setWeightLimit(BigDecimal.valueOf(500.20));
-        lowBatteryDrone.setState(DroneStateEnum.IDLE);
-        lowBatteryDrone.setMedications(new ArrayList<>());
-
         //        Create drone 3
         Drone loadingDrone = new Drone();
         loadingDrone.setSerialNumber("FD120091");
@@ -79,7 +69,7 @@ class DroneServiceTest {
         medication.setWeight(BigDecimal.valueOf(100));
 
 //        List of drones
-        drones = List.of(drone, lowBatteryDrone, loadingDrone);
+        drones = List.of(drone, loadingDrone);
     }
 
     @Test
@@ -99,6 +89,7 @@ class DroneServiceTest {
         assertEquals(droneRegisterReq.getSerialNumber(), response.getSerialNumber());
         assertEquals(100, response.getBatteryCapacity());
         assertEquals(DroneStateEnum.IDLE, response.getState());
+        verify(droneRepository).save(any(Drone.class));
 
     }
 
@@ -118,6 +109,8 @@ class DroneServiceTest {
         assertNotNull(response);
         assertEquals(1L, response.getId());
         assertEquals(droneLoadReq.getCode(), response.getCode());
+
+        verify(medicationRepository).save(any(Medication.class));
     }
 
     @Test
@@ -134,7 +127,7 @@ class DroneServiceTest {
     }
 
     @Test
-    public void shouldReturnBatteryDetails(){
+    public void shouldReturnBatteryDetails() {
         when(droneRepository.findById(1L)).thenReturn(Optional.of(drone));
 
         var response = droneService.checkBattery(1L);
@@ -143,12 +136,27 @@ class DroneServiceTest {
     }
 
     @Test
-    public void shouldReturnListOfDrones(){
-        when(droneRepository.findAllByBatteryCapacityLessThanAndState(25, DroneStateEnum.IDLE)).thenReturn(drones);
+    public void shouldReturnListOfDrones() {
+        when(droneRepository.findAllByBatteryCapacityGreaterThanAndState(25, DroneStateEnum.IDLE)).thenReturn(drones);
 
         var response = droneService.availableDrones();
 
         assertEquals(2, response.size());
+    }
+
+    @Test
+    public void shouldReturnLoadedDrone() {
+
+        when(droneRepository.findById(1L)).thenReturn(Optional.ofNullable(drone));
+
+        var response = droneService.getDroneById(1L);
+        assertNotNull(response);
+    }
+
+    @Test
+    public void shouldRThrowNotFoundWhenDroneIsNotFound() {
+        var response = assertThrows(NotFoundException.class, () -> droneService.getDroneById(1L));
+        assertEquals("Drone does not exist", response.getMessage());
     }
 
 }
