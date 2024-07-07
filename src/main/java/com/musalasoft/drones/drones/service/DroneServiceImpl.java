@@ -47,7 +47,6 @@ public class DroneServiceImpl implements DroneService {
         Drone drone = getDroneById(droneId);
         List<Medication> allMedication = drone.getMedications();
 
-        //Set status of the drone to loading once this is the first medication being added
         if (allMedication.isEmpty()) drone.setState(DroneStateEnum.LOADING);
 
 
@@ -92,7 +91,7 @@ public class DroneServiceImpl implements DroneService {
         List<Drone> drones = droneRepository.findAll();
         for (Drone drone : drones) {
             AuditLog log = new AuditLog();
-            log.setId(drone.getId());
+            log.setDroneId(drone.getId());
             log.setBatteryCapacity(drone.getBatteryCapacity());
             log.setTimestamp(LocalDateTime.now());
             auditLogRepository.save(log);
